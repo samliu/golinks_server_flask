@@ -4,8 +4,11 @@ import sqlite3
 import textwrap
 
 class GolinksDatabase(object):
-  def __init__(self, db_name='golinks.db'):
-    self.db = sqlite3.connect(db_name)
+  def __init__(self, db_name='golinks.db', in_mem=False):
+    if in_mem:
+      self.db = sqlite3.connect(":memory:")
+    else:
+      self.db = sqlite3.connect(db_name)
     self.c = self.db.cursor()
 
   def __del__(self):
