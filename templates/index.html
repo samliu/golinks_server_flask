@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <style type="text/css">
+      #searchInput {
+        background-image: url('/css/searchicon.png'); /* Add a search icon to input */
+        background-position: 10px 12px; /* Position the search icon */
+        background-repeat: no-repeat; /* Do not repeat the icon image */
+        width: 100%; /* Full-width */
+        font-size: 16px; /* Increase font-size */
+        padding: 12px 20px 12px 40px; /* Add some padding */
+        border: 1px solid #ddd; /* Add a grey border */
+        margin-bottom: 12px; /* Add some space below the input */
+      }
+      
+      #golinksTable {
+        border-collapse: collapse; /* Collapse borders */
+        width: 100%; /* Full-width */
+        border: 1px solid #ddd; /* Add a grey border */
+        font-size: 18px; /* Increase font-size */
+      }
+      
+      #golinksTable th, #golinksTable td {
+        text-align: left; /* Left-align text */
+        padding: 12px; /* Add padding */
+      }
+      
+      #golinksTable tr {
+        /* Add a bottom border to all table rows */
+        border-bottom: 1px solid #ddd;
+      }
+      
+      #golinksTable tr.tableHeader, #golinksTable tr:hover {
+        /* Add a grey background color to the table header and on hover */
+        background-color: #f1f1f1;
+      }
+
+    </style>
+  </head>
+  <body>
+    <p>Welcome to Sammy's golink server!</p>
+    <p><a href="create">Create a new link here.</a></p>
+
+    <input type="text" id="searchInput" onkeyup="tableSearch()" placeholder="Filter golinks">
+    
+    <table id="golinksTable">
+      <tr class="tableHeader">
+        <th style="width:20%;">Golink</th>
+        <th style="width:20%;">Destination URL</th>
+        <th style="width:60%;">URL Description</th>
+      </tr>
+      {% for row in rows: %}
+      <tr>
+	<td><a href="go/{{row['alias']}}">go/{{row['alias']}}</a></td>
+        <td>{{row['url']}}</td>
+        <td>{{row['description']}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <script>
+    function tableSearch() {
+      // Declare variables
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("searchInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("golinksTable");
+      tr = table.getElementsByTagName("tr");
+    
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+    </script>
+  </body>
+</html>

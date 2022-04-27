@@ -1,8 +1,30 @@
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, render_template, request, url_for 
 
 from db import GolinksDatabase 
   
 app = Flask(__name__)
+
+
+def sanitize_alias(link_text):
+  if link_text.startswith('http://'):
+    link_text = link_text[7:]
+  if link_text.startswith('https://'):
+    link_text = link_text[8:]
+  if link_text.startswith('go/'):
+    link_text = link_text[3:]
+  link_text = link_text.replace("/","")
+  link_text = link_text.replace(".","")
+  link_text = link_text.replace("?","")
+  link_text = link_text.replace("+","")
+  link_text = link_text.replace("\"","")
+  link_text = link_text.replace("'","")
+  return link_text.strip()
+
+def add_http(url_text):
+  if (not url_text.startswith('http://')
+      and not url_text.startswith('https://')):
+    url_text = f'http://{url_text}'
+  return url_text
 
 @app.route(
         '/create',
@@ -13,6 +35,10 @@ def create():
     description = request.args.get('description') or ''
 
     if link_text and url and description:
+      link_text = sanitize_alias(link_text)
+      url = add_http(url)
+      description = description.replace('"', '\'') 
+
       db = GolinksDatabase()
       db.insert_row(
         link_text=link_text,
@@ -47,11 +73,17 @@ def default_handle(path):
       db = GolinksDatabase()
       all_rows = db.select_summary()
 
-      enumerated_links = '<ul>'
+      rows = []
       for row in all_rows:
-          enumerated_links += f'<li>go/{row[1]} -> {row[2]}: {row[3]}</li>'
-      enumerated_links += '</ul>'
+          rows.append({
+              'alias': row[1], 
+              'url': row[2], 
+              'description': row[3]})
 
+      return render_template(
+        'index.html',
+        title='Golinks Server',
+        rows=rows)
       return f'''
       Welcome to Sammy\'s golink server!
       <a href="create">Create a new link here.</a><br/>
@@ -63,7 +95,9 @@ def default_handle(path):
     if url:
       return redirect(url, code=302)
       
-    return f'go/{path} does not exist. <a href="create">Create it?</a>'
+    return f'''
+    go/{path} does not exist. <a href="create?link_text={path}">Create it?</a>
+    '''
   
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
