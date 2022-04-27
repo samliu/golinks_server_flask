@@ -14,15 +14,27 @@ def create():
 
     if link_text and url and description:
       db = GolinksDatabase()
-      db.insert_row(link_text=link_text, destination_url=url, description=description)
+      db.insert_row(
+        link_text=link_text,
+        destination_url=url,
+        description=description)
       db.commit()
-      return f'Successfully created go/{link_text} as an alias to {url}! <a href="/">See all golinks here.</a>'
+      return f'''
+        Successfully created go/{link_text} as an alias to {url}!
+        <a href="/">See all golinks here.</a>
+      '''
 
     form = f'''
     <form action="create">
-      <li>Alias (go/<alias>): <input type="text" name="link_text" value="{link_text}"/></li>
+      <li>
+        Alias (go/<alias>):
+        <input type="text" name="link_text" value="{link_text}"/>
+      </li>
       <li>URL: <input type="text" name="url" value="{url}"/></li>
-      <li>Short description: <input type="text" name="description" value="{description}"/></li>
+      <li>
+        Short description:
+        <input type="text" name="description" value="{description}"/>
+      </li>
       <input type="submit">
     </form>
     '''
@@ -39,7 +51,12 @@ def default_handle(path):
       for row in all_rows:
           enumerated_links += f'<li>go/{row[1]} -> {row[2]}: {row[3]}</li>'
       enumerated_links += '</ul>'
-      return f'Welcome to Sammy\'s golink server! <a href="create">Create a new link here.</a><br/>{enumerated_links}'
+
+      return f'''
+      Welcome to Sammy\'s golink server!
+      <a href="create">Create a new link here.</a><br/>
+      {enumerated_links}
+      '''
 
     db = GolinksDatabase()
     url = db.select_url_by_link_text(path)
