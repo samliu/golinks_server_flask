@@ -83,6 +83,14 @@ class GolinksDatabase(object):
       return rows[0][0]
     return None
 
+  def delete_url_by_link_text(self, link_text: str):
+    DELETE_BY_LINK_TEXT = f'''
+      DELETE
+      FROM golinks
+      WHERE link_text="{link_text}"
+    '''
+    self.c.execute(DELETE_BY_LINK_TEXT)
+
 def cli():
   # Create the DB if it doesn't already exist.
   db = GolinksDatabase()
@@ -96,6 +104,11 @@ def cli():
   #   description='My blog! yay')
   # db.commit() 
   # db.select_all()
+
+  # Here's how you delete a link. Uncomment these two lines to use db.py to
+  # delete a link.
+  # db.delete_url_by_link_text('linktodelete')
+  # db.commit()
 
   # This is how you fetch the row from text.
   # print(db.select_url_by_link_text('blog'))
